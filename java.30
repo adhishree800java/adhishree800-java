@@ -1,0 +1,74 @@
+import java.util.*;
+
+class Solution {
+    public List<Integer> findSubstring(String s, String[] words) {
+
+        List<Integer> result = new ArrayList<>();
+
+        int wordLen = words[0].length();
+        int wordCount = words.length;
+        int totalLen = wordLen * wordCount;
+
+        if (s.length() < totalLen) {
+            return result;
+        }
+
+        // Store how many times each word should appear
+        Map<String, Integer> required = new HashMap<>();
+
+        for (String word : words) {
+            required.put(word, required.getOrDefault(word, 0) + 1);
+        }
+
+        // Try every possible starting offset
+        for (int start = 0; start < wordLen; start++) {
+
+            int left = start;
+            int count = 0;
+
+            Map<String, Integer> current = new HashMap<>();
+
+            for (int right = start;
+                 right + wordLen <= s.length();
+                 right += wordLen) {
+
+                String word = s.substring(right, right + wordLen);
+
+                // Word is not in words
+                if (!required.containsKey(word)) {
+                    current.clear();
+                    count = 0;
+                    left = right + wordLen;
+                    continue;
+                }
+
+                current.put(word, current.getOrDefault(word, 0) + 1);
+                count++;
+
+                // Too many copies of this word
+                while (current.get(word) > required.get(word)) {
+                    String leftWord = s.substring(left, left + wordLen);
+
+                    current.put(leftWord, current.get(leftWord) - 1);
+
+                    left += wordLen;
+                    count--;
+                }
+
+                // Found all words
+                if (count == wordCount) {
+                    result.add(left);
+
+                    // Move window forward
+                    String leftWord = s.substring(left, left + wordLen);
+                    current.put(leftWord, current.get(leftWord) - 1);
+
+                    left += wordLen;
+                    count--;
+                }
+            }
+        }
+
+        return result;
+    }
+}

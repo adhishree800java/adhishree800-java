@@ -1,0 +1,32 @@
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+    public List<List<Integer>> combine(int n, int k) {
+        List<List<Integer>> result = new ArrayList<>();
+        backtrack(1, n, k, new ArrayList<>(), result);
+        return result;
+    }
+
+    private void backtrack(int start, int n, int k, List<Integer> current, List<List<Integer>> result) {
+        // Base case: If the combination is of the desired length k, add it to the result
+        if (current.size() == k) {
+            result.add(new ArrayList<>(current));
+            return;
+        }
+
+        // Optimization: If the remaining elements in the range are fewer than needed, stop
+        // Elements needed = k - current.size()
+        // Elements available from 'start' to 'n' = n - start + 1
+        for (int i = start; i <= n - (k - current.size()) + 1; i++) {
+            // 1. Choose the element
+            current.add(i);
+            
+            // 2. Explore further elements recursively (increment start pointer to i + 1)
+            backtrack(i + 1, n, k, current, result);
+            
+            // 3. Backtrack (remove the last added element to try other options)
+            current.remove(current.size() - 1);
+        }
+    }
+}

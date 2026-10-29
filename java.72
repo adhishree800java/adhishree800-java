@@ -1,0 +1,41 @@
+class Solution {
+    public int minDistance(String word1, String word2) {
+        int m = word1.length();
+        int n = word2.length();
+        
+        // dp[i][j] will store the minimum operations to convert word1[0...i-1] to word2[0...j-1]
+        int[][] dp = new int[m + 1][n + 1];
+        
+        // Base case: Converting an empty word1 to word2 requires insertions
+        for (int j = 0; j <= n; j++) {
+            dp[0][j] = j;
+        }
+        
+        // Base case: Converting word1 to an empty word2 requires deletions
+        for (int i = 0; i <= m; i++) {
+            dp[i][0] = i;
+        }
+        
+        // Fill the DP table
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                // If characters match, no new operation is needed
+                if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    // If characters don't match, find the minimum of:
+                    // 1. Delete (dp[i-1][j])
+                    // 2. Insert (dp[i][j-1])
+                    // 3. Replace (dp[i-1][j-1])
+                    int deleteOp = dp[i - 1][j];
+                    int insertOp = dp[i][j - 1];
+                    int replaceOp = dp[i - 1][j - 1];
+                    
+                    dp[i][j] = 1 + Math.min(deleteOp, Math.min(insertOp, replaceOp));
+                }
+            }
+        }
+        
+        return dp[m][n];
+    }
+}

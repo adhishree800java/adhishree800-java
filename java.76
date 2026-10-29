@@ -1,0 +1,54 @@
+class Solution {
+    public String minWindow(String s, String t) {
+        if (s == null || t == null || s.length() < t.length()) {
+            return "";
+        }
+
+        // Frequency array to store character counts for string t
+        // 128 covers all ASCII characters (both uppercase and lowercase)
+        int[] tFreq = new int[128];
+        for (char c : t.toCharArray()) {
+            tFreq[c]++;
+        }
+
+        int left = 0;
+        int minLeft = 0;
+        int minLen = Integer.MAX_VALUE;
+        int count = t.length(); // Total unique character matching requirements left to fulfill
+
+        // Expand the sliding window using the right pointer
+        for (int right = 0; right < s.length(); right++) {
+            char rightChar = s.charAt(right);
+
+            // If the character is needed by t, decrement our overall requirement count
+            if (tFreq[rightChar] > 0) {
+                count--;
+            }
+            // Decrement the budget for this character in our window tracker
+            tFreq[rightChar]--;
+
+            // When the window is valid (contains all characters of t)
+            while (count == 0) {
+                // Update the minimum window coordinates
+                int currentWindowLen = right - left + 1;
+                if (currentWindowLen < minLen) {
+                    minLen = currentWindowLen;
+                    minLeft = left;
+                }
+
+                // Try to shrink the window from the left
+                char leftChar = s.charAt(left);
+                tFreq[leftChar]++;
+                
+                // If this character puts us into a deficit for t's requirements, break validity
+                if (tFreq[leftChar] > 0) {
+                    count++;
+                }
+                left++;
+            }
+        }
+
+        // Return empty string if no valid window was ever found
+        return minLen == Integer.MAX_VALUE ? "" : s.substring(minLeft, minLeft + minLen);
+    }
+}
